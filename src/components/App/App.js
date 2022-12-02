@@ -38,7 +38,7 @@ export class App extends Component {
     }));
   };
 
-  onSubmit = async e => {
+  onSubmit = e => {
     if (e.searchWord.trim() === '') {
       alert('Enter valid text');
       return;
@@ -48,13 +48,12 @@ export class App extends Component {
 
   render() {
     const { gallery, status, error } = this.state;
-    console.log(gallery);
     return (
       <>
         <Container>
           <Searchbar onSubmit={this.onSubmit} />
         </Container>
-        {status === 'idle' && <Text>Enter keyword</Text>}
+        {status === 'idle' && <Text>Enter key word on form</Text>}
         {status === 'pending' && <Loader />}
         {status === 'resolved' && gallery.length > 0 && (
           <Container>
