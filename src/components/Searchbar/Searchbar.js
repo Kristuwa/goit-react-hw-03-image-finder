@@ -14,7 +14,11 @@ export const Searchbar = ({ onSubmit }) => {
 
   const handleSubmit = (values, { resetForm }) => {
     resetForm();
-    onSubmit(values);
+    if (values.searchWord.trim() === '') {
+      alert('Enter valid text');
+      return;
+    }
+    onSubmit(values.searchWord.toLowerCase());
   };
 
   return (

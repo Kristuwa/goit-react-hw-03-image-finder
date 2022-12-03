@@ -8,5 +8,13 @@ export const fetchApiGallery = async (searchWord, page) => {
   const response = await axios.get(
     `/?key=${KEY}&q=${searchWord}&page=${page}&image_type=photo&orientation=horizontal&per_page=12`
   );
-  return response.data.hits;
+  const totalHits = response.data.totalHits;
+  const newData = response.data.hits.map(
+    ({ id, webformatURL, largeImageURL }) => ({
+      id,
+      webformatURL,
+      largeImageURL,
+    })
+  );
+  return { totalHits, newData };
 };

@@ -14,18 +14,20 @@ export class App extends Component {
     page: 1,
     error: null,
     status: 'idle',
+    totalHits: null,
   };
 
   async componentDidUpdate(_, prevState) {
-    if (
-      prevState.searchWord !== this.state.searchWord ||
-      prevState.page !== this.state.page
-    ) {
-      const { searchWord, page } = this.state;
+    const { searchWord, page } = this.state;
+    if (prevState.searchWord !== searchWord || prevState.page !== page) {
       try {
         this.setState({ status: 'pending' });
-        const gallery = await API.fetchApiGallery(searchWord, page);
-        this.setState({ gallery, status: 'resolved' });
+        const galleryList = await API.fetchApiGallery(searchWord, page);
+        this.setState(prevState => ({
+          gallery: [...prevState.gallery, ...galleryList.newData],
+          status: 'resolved',
+          totalHits: galleryList.totalHits,
+        }));
       } catch (error) {
         this.setState({ error: true, status: 'rejected' });
       }
@@ -38,16 +40,17 @@ export class App extends Component {
     }));
   };
 
-  onSubmit = e => {
-    if (e.searchWord.trim() === '') {
-      alert('Enter valid text');
-      return;
-    }
-    this.setState({ searchWord: e.searchWord.toLowerCase(), page: 1 });
+  onSubmit = data => {
+    this.setState({
+      searchWord: data,
+      page: 1,
+      gallery: [],
+    });
   };
 
   render() {
-    const { gallery, status, error } = this.state;
+    const { gallery, status, error, totalHits, page } = this.state;
+    const totalPage = totalHits / 12;
     return (
       <>
         <Container>
@@ -55,10 +58,10 @@ export class App extends Component {
         </Container>
         {status === 'idle' && <Text>Enter key word on form</Text>}
         {status === 'pending' && <Loader />}
-        {status === 'resolved' && gallery.length > 0 && (
+        {gallery.length > 0 && (
           <Container>
             <ImageGallery gallery={gallery} />
-            <Button onClick={this.loadMore} />
+            {totalPage > page && <Button onClick={this.loadMore} />}
           </Container>
         )}
         {status === 'resolved' && gallery.length === 0 && (
